@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Lantern Studio workshop pickup badges</title>
+  <style>
+    @page { size: A4 portrait; margin: 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #182820;
+      background: white;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(2, 86mm);
+      gap: 8mm;
+      width: 180mm;
+      margin: 0 auto;
+    }
+    article {
+      height: 54mm;
+      padding: 6mm;
+      border: 0.3mm solid #737e75;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      break-inside: avoid;
+    }
+    .name {
+      align-self: center;
+      text-align: center;
+      font-size: 32pt;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .seat {
+      border-top: 0.4mm solid #637c69;
+      padding-top: 2mm;
+      text-align: right;
+      font-size: 12pt;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+    @media screen { body { padding: 15mm; } }
+  </style>
+</head>
+<body>
+  <main>
+    <article data-seat="V01">
+      <div class="name">Lux</div>
+      <div class="seat">V01</div>
+    </article>
+    <article data-seat="V03">
+      <div class="name">Welcome</div>
+      <div class="seat">V03</div>
+    </article>
+    <article data-seat="V04">
+      <div class="name">Lux</div>
+      <div class="seat">V04</div>
+    </article>
+  </main>
+</body>
+</html>

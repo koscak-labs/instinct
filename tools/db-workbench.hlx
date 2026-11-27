@@ -1,0 +1,49 @@
+# Public Helix DB example runner [GAMMA-Codon/S]. Offline, DB examples only.
+AAC # use std::{env,fs,io,path::Path,process::Command,time::{SystemTime,UNIX_EPOCH}}
+AAA # fn rust_source(input:&str) -> Result<String,String>
+AAC # let mut stage = 0
+AAC # let mut src = String::from("#![allow(dead_code)]\n")
+AGA # for (number,line) in input.lines().enumerate()
+AAC # let line = line.trim()
+CAA # if line.is_empty() || line.starts_with('#')
+AAC # continue
+TTT # end
+AAC # let error = || format!("unsupported DB-workbench instruction at line {}: {line}", number + 1)
+AAC # let (op, value) = line.split_once('#').ok_or_else(error)?
+ACG # match (stage,op.trim(),value.trim())
+TAC # (0,"GGGGT","db") => { src.push_str(include_str!("../runtime/helix-db.rs")); src.push('\n'); stage=1; },
+TAC # (1,"AAA","fn main()") => { src.push_str("fn main() {\n"); stage=2; },
+TAC # (2,"AAC",stmt) if !stmt.is_empty() => { src.push_str(stmt); src.push_str(";\n"); },
+TAC # (2,"TTT","end") => { src.push_str("}\n"); stage=3; },
+TAC # _ => return Err(error()),
+TTT # end
+TTT # end
+CAA # if stage != 3
+AAC # return Err("expected GGGGT db and a complete fn main() block".into())
+TTT # end
+TAC # Ok(src)
+TTT # end
+AAA # fn execute(dir:&Path,src:&str) -> io::Result<()>
+AAC # let file = dir.join("example.rs")
+AAC # let bin = dir.join(format!("example{}",env::consts::EXE_SUFFIX))
+AAC # fs::write(&file,src)?
+AAC # let built = Command::new(env::var_os("RUSTC").unwrap_or_else(||"rustc".into())).args(["--edition=2021","-o"]).arg(&bin).arg(&file).status()?
+CAA # if !built.success()
+AAC # return Err(io::Error::other("Rust compilation failed"))
+TTT # end
+AAC # let ran = Command::new(&bin).current_dir(dir).status()?
+CAA # if !ran.success()
+AAC # return Err(io::Error::other("Helix DB example failed"))
+TTT # end
+TAC # Ok(())
+TTT # end
+AAA # fn main() -> io::Result<()>
+AAC # let path = env::args_os().nth(1).ok_or_else(||io::Error::other("supply an example .hlx file"))?
+AAC # let src = rust_source(&fs::read_to_string(path)?).map_err(io::Error::other)?
+AAC # let stamp = SystemTime::now().duration_since(UNIX_EPOCH).map_err(io::Error::other)?.as_nanos()
+AAC # let dir = env::temp_dir().join(format!("helix-db-workbench-{}-{stamp}",std::process::id()))
+AAC # fs::create_dir(&dir)?
+AAC # let result = execute(&dir,&src)
+AAC # fs::remove_dir_all(dir)?
+TAC # result
+TTT # end

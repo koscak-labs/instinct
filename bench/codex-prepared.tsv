@@ -1,0 +1,7 @@
+route	model	case	arm	recall_ms	context_bytes	decision_ms	first_correct	exact_pass	answer
+codex	gpt-6.2-sol	dispensing	base	0	0	4861	true	true	C 1
+codex	gpt-6.2-sol	coupon	static	0	665	5405	true	true	B 2
+codex	gpt-6.2-sol	dispensing	live	2	0	5144	true	true	C 1
+codex	gpt-6.2-sol	coupon	base	0	0	5232	true	true	B 2
+codex	gpt-6.2-sol	dispensing	static	0	665	4200	true	true	C 1
+codex	gpt-6.2-sol	coupon	live	1	0	4447	true	true	B 2

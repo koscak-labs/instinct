@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	live	claude-haiku-5-5	794	2	0	4627	wrong	Shortlist approved. You: pick a cover / Me: send the prints
+new-brief	live	claude-haiku-5-5	794	2	0	3291	pass	The cover is ready.
+scope	live	claude-haiku-5-5	843	1	0	2554	pass	Little team. Big plans. Save my place.
+rewrite	live	claude-haiku-5-5	30	2	0	2486	pass	Room for your whole team.
+loop	live	claude-haiku-5-5	952	2	1	6468	pass	relink
+confirmed	live	claude-haiku-5-5	952	2	0	2849	pass	done

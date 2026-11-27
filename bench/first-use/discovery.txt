@@ -1,0 +1,7 @@
+A teammate is starting three independent tasks with an AI assistant. The following fictional examples are the only prior outcomes. Extract one reusable, scoped method per incident. The next tasks will be different. Return JSON only, an object with a bank array in incident order. Every entry has short string fields title, when, found, how, evidence, reconsider. Keep the exact format of any accepted convention. Use plain language that someone might use to describe the situation. Do not treat an example as a universal preference.
+
+1. Tess said "write my usual client update." The assistant wrote a full progress report. Her client had to ask who should do what. Tess tried a single line: "You: choose a photo / Me: finish the poster". The client replied with their choice and Tess approved that format for her usual client updates. She also sends other types of messages.
+
+2. An assistant cleaned up an approved signup page. It corrected a misspelling but also renamed the button and rewrote the headline. The owner reverted that version. The accepted revision corrected the misspelling and preserved every other word. Later, when the same owner explicitly asked for a new headline, they accepted replacement copy.
+
+3. A pack showed Ready in the author's editor. An intended reader still saw the old edition after two identical exports. Opening the exact shared link as the reader showed it pointed to the old file. The owner corrected that link, and the reader opened the new edition. A later export was not needed.

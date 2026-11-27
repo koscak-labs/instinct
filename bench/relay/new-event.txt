@@ -1,0 +1,11 @@
+Please make the printable pickup badges for the next Lantern Studio workshop. Use our usual desk convention. An order account can differ from the guest's badge name. An empty badge name is intentional. This is the complete new export:
+seat,edit,sleeve,order account,badge name
+T01,3,green,Marta Perry,Nico
+T02,1,yellow,Lio Vale,Jules
+T03,1,green,Iris Lane,Ash
+T04,1,yellow,Eva Hill,
+T01,1,yellow,Marta Perry,Nico
+T05,2,yellow,Oli Bell,Jules
+T03,2,yellow,Iris Lane,Ash
+T06,1,green,Uma Cole,
+T05,1,green,Oli Bell,Jules

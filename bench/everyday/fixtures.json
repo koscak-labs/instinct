@@ -1,0 +1,36 @@
+{
+  "bank": [
+    {
+      "title": "Getting out of Glass Hall takes twelve minutes",
+      "when": "Planning a night at Glass Hall around the last train after a show",
+      "found": "We missed our train after the comedy show. The map started outside the venue. Our timed walk from our seats to the street took another twelve minutes.",
+      "how": "At Glass Hall, allow twelve minutes to get outside, then add the walk to the station. Work back from the last train.",
+      "reconsider": "If someone is picking us up and will wait outside, we can stay to the end.",
+      "evidence": "Fictional outing. We left our seats at 10:50 and reached the street at 11:02."
+    },
+    {
+      "title": "Send the surprise link to yourself first",
+      "when": "Sharing a link in a group chat before a surprise reveal",
+      "found": "My sister saw her birthday surprise in the link preview. Nobody had even opened the invite.",
+      "how": "Send the link to yourself in the same chat app. Read the title and thumbnail as the recipient sees them, then share a spoiler-free preview.",
+      "reconsider": "Once the reveal is public, use the real title and picture so people know what they are opening.",
+      "evidence": "Fictional invite. Its chat preview showed the party name above the unopened link."
+    },
+    {
+      "title": "Show the thing in someone's hand",
+      "when": "Choosing a shop photo when buyers keep asking how big a handmade piece is",
+      "found": "People thought my tiny vase was a full-size jug. The close-up showed the glaze beautifully and gave them no sense of scale.",
+      "how": "Lead with a photo in a hand or beside a familiar object. Keep the close-up as the second picture.",
+      "reconsider": "If a buyer needs to fit a particular space, measure the piece and compare the exact dimensions.",
+      "evidence": "Fictional shop. After seeing the vase beside a mug, the buyer could identify its size."
+    }
+  ],
+  "cases": [
+    {"id":"encore","situation":"We are seeing a band at Glass Hall. Can we stay for the encore and still make the last train?","records":"The main set ends at 10:40. The encore ends at 10:50. Our train departs at 11:00. It takes five minutes from the street to the platform. We want the most music we can catch without missing our ride. Options: main (leave after the main set), encore (stay for the encore).","reference":"It takes our group twelve minutes from our seats to the street at this venue.","answer":"main"},
+    {"id":"lift","situation":"Same show at Glass Hall, but my sister is driving us home. Can we stay for the encore?","records":"The main set ends at 10:40, the encore at 10:50. My sister promises to wait outside until we get there. We want to hear as much music as possible. Options: main (leave after the main set), encore (stay for the encore).","reference":"There is no pickup deadline and nobody in our group is catching the train.","answer":"encore"},
+    {"id":"gift","situation":"I built a group gift page with AI. Which link should I share in our group chat before the surprise reveal?","records":"The gift is still secret. The group includes its recipient. Both links go to the same generic sign-in screen. Opening either link reveals nothing to a guest. Link sun uses a plain URL; link moon has a hand-drawn envelope icon. Options: sun, moon.","reference":"In this messaging app, sun expands to 'Maya's surprise record player' with a picture of the gift. Moon expands to 'A note for the group' with an envelope. The preview is visible to everyone in the chat.","answer":"moon"},
+    {"id":"public","situation":"The surprise reveal is over. Which link should I send in the group chat so everyone can find the gift photos?","records":"Everyone has seen the record player. Link sun previews as 'Maya's record player photos' with her smiling picture, used with her permission. Link moon previews as 'A note for the group'. Both go to the same photo album. Options: sun, moon.","reference":"Maya wants the album to be easy to find when the group scrolls back.","answer":"sun"},
+    {"id":"photo","situation":"I'm choosing a shop photo for a handmade bowl. Buyers keep asking how big it is. Which photo goes first?","records":"Both shots show the whole bowl. Palm shows it resting in a person's open hand. Glaze shows it alone on a seamless backdrop in sharp detail. Options: glaze, palm.","reference":"The listing needs to communicate the bowl's scale at a glance on a phone.","answer":"palm"},
+    {"id":"shelf","situation":"A buyer likes my handmade bowl. They need it to fit a small shelf. What should I send them?","records":"The shelf is 11 cm deep. The buyer wants to know if the bowl will fit without overhang. Options: palm (a new lifestyle photo), measure (the measured diameter of the bowl at its widest).","reference":"The buyer needs an exact fit check.","answer":"measure"}
+  ]
+}

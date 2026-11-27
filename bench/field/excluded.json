@@ -1,0 +1,17 @@
+[
+  {
+    "arm": "static",
+    "observed": true,
+    "excluded": "Native host instructions affected the first action. Excluded from performance comparisons."
+  },
+  {
+    "arm": "live",
+    "observed": true,
+    "excluded": "Native host instructions affected the first action. Excluded from performance comparisons."
+  },
+  {
+    "arm": "base",
+    "observed": true,
+    "excluded": "Native host instructions affected the first action. Excluded from performance comparisons."
+  }
+]

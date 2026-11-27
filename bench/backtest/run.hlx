@@ -1,0 +1,77 @@
+# Portable replay of decisions: jq reads the fixture; only the case and permitted evidence reach the model.
+AAC # use std::{env,fs,io::Write,path::{Path,PathBuf},process::{Command,Stdio},time::Instant}
+AAA # fn output(cmd:&mut Command)->String
+AAC # let r=cmd.output().expect("start process")
+AAC # assert!(r.status.success(),"process failed: {}",String::from_utf8_lossy(&r.stderr))
+TAC # String::from_utf8(r.stdout).expect("UTF8").trim().to_owned()
+TTT # end
+AAA # fn read_field(file:&Path,key:&str)->String
+TAC # output(Command::new("jq").args(["-er",key]).arg(file))
+TTT # end
+AAA # fn ask_claude(dir:&Path,model:&str,prompt:&str)->Result<String,String>
+AAC # let mut cmd=Command::new("timeout")
+AAC # cmd.args(["90","claude","-p","--model",model,"--tools","","--settings","{\"disableAllHooks\":true}","--setting-sources","","--strict-mcp-config","--no-session-persistence"]).current_dir(dir)
+AAC # let response=cmd.arg(prompt).output().map_err(|e|e.to_string())?
+AAC # if !response.status.success(){return Err(format!("Claude process failed {}",response.status))}
+TAC # String::from_utf8(response.stdout).map(|s|s.trim().to_owned()).map_err(|e|e.to_string())
+TTT # end
+AAA # fn ask(dir:&Path,model:&str,prompt:&str,claude:bool)->Result<String,String>
+CAA # if claude
+AAC # return ask_claude(dir,model,prompt)
+TTT # end
+AAC # let mut child=Command::new("timeout").arg("90").args(["codex","exec","--ephemeral","--ignore-user-config","--skip-git-repo-check","-s","read-only","-m",model,"-c","project_doc_max_bytes=0","-c","features.shell_tool=false","--json","-o","response","-"]).current_dir(dir).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().map_err(|e|e.to_string())?
+AAC # child.stdin.take().unwrap().write_all(prompt.as_bytes()).map_err(|e|e.to_string())?
+AAC # let r=child.wait_with_output().map_err(|e|e.to_string())?
+AAC # if !r.status.success(){return Err(format!("model process failed {}",r.status))}
+AAC # let trace=dir.join("trace.jsonl")
+AAC # fs::write(&trace,&r.stdout).map_err(|e|e.to_string())?
+AAC # let ok=Command::new("jq").args(["-es","all(.[]; (.item.type? // \"\") as $t | ([\"command_execution\",\"mcp_tool_call\",\"web_search\",\"file_change\"] | index($t)) == null)"]).arg(trace).stdout(Stdio::null()).status().map_err(|e|e.to_string())?
+AAC # if !ok.success(){return Err("unexpected tool use or malformed trace".into())}
+TAC # fs::read_to_string(dir.join("response")).map(|s|s.trim().to_owned()).map_err(|e|e.to_string())
+TTT # end
+AAA # fn main
+AAC # let args:Vec<_>=env::args().collect()
+AAC # let arm=args.get(1).map(String::as_str).unwrap_or("demo")
+AAC # assert!(matches!(arm,"demo"|"base"|"static"|"live"),"use demo, base, static or live")
+AAC # let model=args.get(2).map(String::as_str).unwrap_or("gpt-6.2-astra")
+AAC # let everyday=args.iter().skip(3).any(|arg| arg=="everyday")
+AAC # let first_use=args.iter().skip(3).any(|arg| arg=="first-use")
+AAC # let claude=args.iter().skip(3).any(|arg| arg=="claude")
+AAC # let suite=if first_use {"first-use"} else if everyday {"everyday"} else {"backtest"}
+AAC # let folder=Path::new(env!("CARGO_MANIFEST_DIR")).join("bench").join(suite)
+AAC # let fixture=folder.join(if first_use {"discoveries.json"} else {"fixtures.json"})
+AAC # let cases_file=if first_use {folder.join("cases.json")} else {fixture.clone()}
+AAC # let case_list=if first_use {"."} else {".cases"}
+AAC # let engine=env::current_exe().unwrap().parent().unwrap().parent().unwrap().join("instinct")
+AAC # assert!(engine.is_file(),"build the instinct binary in the same Cargo profile first")
+AAC # let tmp=PathBuf::from(output(Command::new("mktemp").arg("-d")))
+AAC # let bank=|args:&[String]|output(Command::new(&engine).env_clear().env("INSTINCT_STORE",tmp.join("bank")).args(args))
+AAC # let n:usize=read_field(&fixture,".bank|length").parse().unwrap()
+TAC # for i in 0..n {
+AAC # let mut a=vec!["bank".to_string()]
+AAC # for field in ["title","when","found","how","reconsider","evidence"] {a.extend([format!("--{field}"),read_field(&fixture,&format!(".bank[{i}].{field}"))]);}
+AAC # bank(&a)
+TAC # }
+AAC # let packet=read_field(&fixture,".bank | map({when,method:.how,observed:.found,reconsider_if:.reconsider,evidence}) | tojson")
+AAC # let cases:usize=read_field(&cases_file,&format!("{case_list}|length")).parse().unwrap()
+AAC # if arm!="demo" {println!("case\tarm\tmodel\tcontext_bytes\trecall_ms\tdocs\ttotal_ms\tgrade\tanswer");}
+AAC # let reverse=args.get(3).map(String::as_str)==Some("reverse")
+TAC # for position in 0..cases {
+AAC # let i=if reverse {cases-position-1} else {position}
+AAC # let field=|key:&str|read_field(&cases_file,&format!("{case_list}[{i}].{key}"))
+AAC # let (id,question,records,reference,expected)=(field("id"),field("situation"),field("records"),field("reference"),field("answer"))
+AAC # let dir=tmp.join(&id)
+AAC # fs::create_dir(&dir).unwrap()
+AAC # let start=Instant::now()
+AAC # let context=match arm {"base"=>String::new(),"static"=>packet.clone(),_=>bank(&["decide".into(),"--q".into(),question.clone()])}
+AAC # let elapsed=start.elapsed().as_millis()
+AAC # if arm=="demo"{println!("{id}\n{question}\n{context}\n"); continue;}
+AAC # let prompt=if first_use {format!("Complete this user request using the available material. Follow their output format. If an additional fact could change your answer and you need the available note, reply with exactly READ. Use no tools.\nPrior experience, if relevant: {context}\nRequest: {question}\nMaterial: {records}")} else if everyday {format!("Help a person choose between the listed options. Your only sources are the supplied facts and optional past experience. If you need one more fact, answer only READ to see the available note. Otherwise answer only with the chosen option's ID. No tools.\nPast experience: {context}\nQuestion: {question}\nDetails: {records}")} else {format!("You are adjudicating records. Optional previous experience is fallible. Answer using only the final value (lowercase comma-separated IDs or one number). If you need the project's authoritative contract, return just READ to obtain it. Both reading and answering are allowed. Do not use tools.\nExperience: {context}\nTask: {question}\nRecords: {records}")}
+AAC # let mut docs=0
+AAC # let mut result=ask(&dir,model,&prompt,claude)
+AAC # if result.as_deref()==Ok("READ"){docs=1;result=ask(&dir,model,&format!("{prompt}\nContract: {reference}\nNow return the final value."),claude);}
+AAC # let (grade,answer)=match result {Ok(a) if a==expected=>("pass",a),Ok(a)=>("wrong",a),Err(e)=>("infra",e)}
+AAC # println!("{id}\t{arm}\t{model}\t{}\t{elapsed}\t{docs}\t{}\t{grade}\t{}",context.len(),start.elapsed().as_millis(),answer.replace(['\r','\n','\t']," "))
+TAC # }
+AAC # fs::remove_dir_all(tmp).unwrap()
+TTT # end

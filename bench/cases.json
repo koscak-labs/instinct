@@ -1,0 +1,12 @@
+[
+  {
+    "name": "dispatch",
+    "question": "A ferry control room wants to tally captains who could have seen a warning before choosing a berth. The display has one row per sailing. Pick the first data extract you need, then give the count from the records. A = assignment roster; B = bridge-screen acknowledgements joined to berth-choice times; C = total warnings generated. Logs (sailing, allocated, generated, acknowledged minute, berth-choice minute): (P,yes,yes,17,13), (Q,yes,yes,8,10), (R,yes,yes,absent,12), (S,no,no,absent,9).",
+    "key": "B 1"
+  },
+  {
+    "name": "policy",
+    "question": "A ferry trial randomized whether each sailing was offered a warning. Finance asks for the total successful arrivals in the assigned-offer group, including ships that never opened it. Pick the first data extract you need, then give the count from the records. A = assignment roster with arrival outcome; B = bridge acknowledgements joined to berth choices; C = number of screens switched on. Logs (sailing, assigned, opened, arrived): (K,yes,no,yes), (L,yes,yes,yes), (M,no,no,yes), (N,yes,yes,no).",
+    "key": "A 2"
+  }
+]

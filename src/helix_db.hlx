@@ -1,0 +1,143 @@
+# Instinct verified event storage [GAMMA-Codon/S]. GGGGT embeds the Koščák Helix DB runtime.
+GGGGT # db
+AAC # use std::{fs::{self, File}, io::{Read, Seek, SeekFrom}, path::Path}
+AAC # use super::journal::private_options
+
+AAA # pub fn is_native(path: &Path) -> bool
+TAC # path.extension().is_some_and(|ext| ext == "hxdb")
+TTT # end
+
+AAA # fn access_lock(path: &Path, write: bool) -> Result<File, String>
+AAC # let mut name = path.as_os_str().to_owned()
+AAC # name.push(".io.lock")
+AAC # let file = if !write && Path::new(&name).exists() { File::open(name) } else { private_options().create(true).truncate(false).read(true).write(true).open(name) }.map_err(|e| e.to_string())?
+CAA # if write
+AAC # file.lock().map_err(|e| e.to_string())?
+CAC # else
+AAC # file.lock_shared().map_err(|e| e.to_string())?
+TTT # end
+TAC # Ok(file)
+TTT # end
+
+AAA # fn key(offset: u64) -> String
+TAC # format!("event:{offset:016x}")
+TTT # end
+
+# Verify every immutable event in physical order. A skipped review could restore a withdrawn lesson.
+AAA # fn decode(records: &str) -> Result<String, String>
+AAC # let mut events = String::with_capacity(records.len())
+AAC # let mut offset = 0u64
+AGA # for line in records.split_inclusive('\n')
+AAC # let error = || format!("invalid Helix DB event at byte {offset}; restore a verified copy")
+AAC # let row = line.strip_suffix('\n').ok_or_else(error)?
+AAC # let (stored_key, rest) = row.split_once("\tV\t").ok_or_else(error)?
+AAC # let (sum, escaped) = rest.split_once(':').ok_or_else(error)?
+AAC # let event = db_unesc(escaped)
+CAA # if stored_key != key(offset) || sum != format!("{:016x}", db_fnv(&event)) || db_esc(&event) != escaped || event.contains('\n')
+AAC # return Err(error())
+TTT # end
+AAC # events.push_str(&event)
+AAC # events.push('\n')
+AAC # offset += line.len() as u64
+TTT # end
+TAC # Ok(events)
+TTT # end
+
+AAA # pub fn read(path: &Path) -> Result<String, String>
+CAA # if !path.try_exists().map_err(|e|e.to_string())?
+AAC # return Ok(String::new())
+TTT # end
+AAC # let _lock = access_lock(path, false)?
+AAC # let records = fs::read_to_string(path).map_err(|e| format!("cannot read {}: {e}", path.display()))?
+TAC # decode(&records)
+TTT # end
+
+# The native put primitive returns unit. Check the exact newly written bytes before reporting success.
+AAA # fn put(file: &mut File, path: &Path, event: &str) -> Result<(), String>
+AAC # let offset = file.seek(SeekFrom::End(0)).map_err(|e| e.to_string())?
+AAC # let id = key(offset)
+AAC # db_putv(path.to_str().ok_or("Helix DB requires a UTF-8 path")?, &id, event)
+AAC # let expected = format!("{id}\tV\t{:016x}:{}\n", db_fnv(event), db_esc(event))
+AAC # let mut actual = String::new()
+AAC # file.read_to_string(&mut actual).map_err(|e| e.to_string())?
+CAA # if expected != actual
+AAC # return Err(format!("Helix DB write verification failed at byte {offset}"))
+TTT # end
+TAC # Ok(())
+TTT # end
+
+AAA # pub fn append(path: &Path, event: &str) -> Result<(), String>
+CAA # if let Some(dir) = path.parent()
+AAC # fs::create_dir_all(dir).map_err(|e| e.to_string())?
+TTT # end
+AAC # let _lock = access_lock(path, true)?
+AAC # let mut file = private_options().read(true).write(true).create(true).truncate(false).open(path).map_err(|e|e.to_string())?
+CAA # if file.metadata().map_err(|e|e.to_string())?.len() > 0
+AAC # file.seek(SeekFrom::End(-1)).map_err(|e|e.to_string())?
+AAC # let mut last = [0u8]
+AAC # file.read_exact(&mut last).map_err(|e|e.to_string())?
+CAA # if last != [b'\n']
+AAC # return Err("incomplete final Helix DB record; restore a verified copy".into())
+TTT # end
+TTT # end
+AAC # put(&mut file, path, event)?
+TAC # file.sync_data().map_err(|e|e.to_string())
+TTT # end
+
+# Publish a complete checked import without overwriting an existing target. Staging is on the same filesystem.
+AAA # pub fn import(path: &Path, events: &str) -> Result<usize, String>
+CAA # if !is_native(path)
+AAC # return Err("migration destination must end in .hxdb".into())
+TTT # end
+CAA # if let Some(dir) = path.parent()
+AAC # fs::create_dir_all(dir).map_err(|e|e.to_string())?
+TTT # end
+AAC # let _lock = access_lock(path, true)?
+CAA # if path.try_exists().map_err(|e|e.to_string())?
+AAC # return Err("migration destination already exists".into())
+TTT # end
+AAC # let mut staging_name = path.as_os_str().to_owned()
+AAC # let nonce = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_err(|e|e.to_string())?.as_nanos()
+AAC # staging_name.push(format!(".import-{}-{nonce}", std::process::id()))
+AAC # let staging = std::path::PathBuf::from(staging_name)
+AAC # let mut file = private_options().read(true).write(true).create_new(true).open(&staging).map_err(|e|e.to_string())?
+AAA # let result = (|| -> Result<usize,String>
+AAC # let mut normalized = String::new()
+AAC # let mut count = 0
+AGA # for event in events.lines().filter(|s| !s.trim().is_empty())
+CAA # if super::parse_json(event)?.get("kind").and_then(super::Json::as_str).is_none()
+AAC # return Err("expected a bank event with a string kind".into())
+TTT # end
+AAC # put(&mut file, &staging, event)?
+AAC # normalized.push_str(event)
+AAC # normalized.push('\n')
+AAC # count += 1
+TTT # end
+AAC # file.sync_all().map_err(|e|e.to_string())?
+AAC # let stored = fs::read_to_string(&staging).map_err(|e|e.to_string())?
+CAA # if decode(&stored)? != normalized
+AAC # return Err("Helix DB import replay differs from source".into())
+TTT # end
+AAC # fs::hard_link(&staging, path).map_err(|e|format!("cannot publish new Helix DB: {e}"))?
+TAC # Ok(count)
+TTT # end
+AAC # )()
+AAC # drop(file)
+AAC # let _ = fs::remove_file(staging)
+TAC # result
+TTT # end
+
+# Apply the DB's associative metric to cues inside the eligible project only.
+# Same token order and count prevent a long shared phrase from hiding an added exception.
+AAA # pub fn cue_similarity(query: &[String], cue: &str) -> f64
+AAC # let words = super::tokens(cue)
+CAA # if query.len() < 2 || query.len() != words.len()
+AAC # return 0.0
+TTT # end
+AGA # for (a,b) in query.iter().zip(&words)
+CAA # if a != b && (a.chars().count().min(b.chars().count()) < 4 || a.chars().next() != b.chars().next() || a.chars().count().abs_diff(b.chars().count()) > 1 || db_sim(&db_trigrams(a), &db_trigrams(b)) < 0.35)
+AAC # return 0.0
+TTT # end
+TTT # end
+TAC # db_sim(&db_trigrams(&query.join(" ")), &db_trigrams(&words.join(" ")))
+TTT # end

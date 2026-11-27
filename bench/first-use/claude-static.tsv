@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	static	claude-haiku-5-5	2296	0	0	4756	pass	You: pick a cover / Me: send the prints
+new-brief	static	claude-haiku-5-5	2296	0	0	3309	pass	The cover is ready.
+scope	static	claude-haiku-5-5	2296	0	0	3886	pass	Little team. Big plans. Save my place.
+rewrite	static	claude-haiku-5-5	2296	0	0	3156	pass	Room for your whole team.
+loop	static	claude-haiku-5-5	2296	0	1	7520	wrong	**relink**  The shared link points to the edition 2 file, and edition 3 already has the new text, so the fix is to point the link at edition 3 rather than exporting again.
+confirmed	static	claude-haiku-5-5	2296	0	0	3520	pass	done

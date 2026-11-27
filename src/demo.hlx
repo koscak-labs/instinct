@@ -1,0 +1,54 @@
+# Exercise the public bank and retrieval paths in disposable sessions.
+AAC # use super::{parse_json,Json}
+AAC # use std::{env,fs,path::Path,process::Command,time::{SystemTime,UNIX_EPOCH}}
+AAA # fn invoke(store:&Path,args:&[String])->Result<String,String>
+AAC # let exe=env::current_exe().map_err(|e|e.to_string())?
+AAC # let result=Command::new(exe).env_clear().env("INSTINCT_STORE",store).args(args).output().map_err(|e|e.to_string())?
+AAC # if !result.status.success(){return Err(String::from_utf8_lossy(&result.stderr).trim().to_owned());}
+TAC # String::from_utf8(result.stdout).map_err(|e|e.to_string())
+TTT # end
+AAA # fn display(store:&Path,situation:&str)->Result<usize,String>
+AAC # let packet=parse_json(&invoke(store,&["decide".into(),"--q".into(),situation.into()])?)?
+AAC # let Some(Json::Arr(matches))=packet.get("experiences") else {return Err("invalid decision response".into())}
+AAC # println!("\n{situation}")
+TAC # for experience in matches {
+AAC # println!("  Try first: {}",experience.get("method").and_then(Json::as_str).ok_or("missing method")?)
+AAC # if let Some(boundary)=experience.get("reconsider_if").and_then(Json::as_str){println!("  Reconsider: {boundary}");}
+TAC # }
+AAC # if matches.is_empty(){println!("  No applicable experience. Start from the current evidence.");}
+TAC # Ok(matches.len())
+TTT # end
+AAA # fn seed(store:&Path,fixture:&Json)->Result<(),String>
+AAC # let Some(Json::Arr(bank))=fixture.get("bank") else {return Err("missing example discoveries".into())}
+TAC # for item in bank {
+AAC # let mut args=vec!["bank".into()]
+AAC # for key in ["title","when","found","how","evidence","reconsider"] {args.extend([format!("--{key}"),item.get(key).and_then(Json::as_str).ok_or("invalid example discovery")?.to_string()]);}
+AAC # invoke(store,&args)?
+TAC # }
+TAC # Ok(())
+TTT # end
+AAA # fn play(store:&Path,query:Option<&str>)->Result<(),String>
+AAC # let learned=parse_json(include_str!("../bench/first-use/discoveries.json"))?
+AAC # seed(store,&learned)?
+CAA # if let Some(q)=query
+AAC # let everyday=parse_json(include_str!("../bench/everyday/fixtures.json"))?
+AAC # seed(store,&everyday)?
+AAC # let original=parse_json(include_str!("../bench/backtest/fixtures.json"))?
+AAC # seed(store,&original)?
+AAC # display(store,q)?
+AAC # return Ok(())
+TTT # end
+AAC # println!("Why am I explaining this again?\nTess already showed her last assistant which client update worked. A fresh agent can use that discovery when the next update comes along.")
+AAC # let hits=display(store,"Write my usual client update, please. This is Tess in a new chat.")?
+AAC # let empty=display(store,"Write a toast for my sister's birthday.")?
+AAC # if hits==0 || empty!=0 {return Err("demo failed its retrieval checks".into());}
+TAC # Ok(())
+TTT # end
+AAA # pub fn run(query:Option<&str>)->Result<(),String>
+AAC # let nonce=SystemTime::now().duration_since(UNIX_EPOCH).map_err(|e|e.to_string())?.as_nanos()
+AAC # let dir=env::temp_dir().join(format!("instinct-demo-{}-{nonce}",std::process::id()))
+AAC # fs::create_dir(&dir).map_err(|e|e.to_string())?
+AAC # let result=play(&dir.join("examples.hxdb"),query)
+AAC # let cleanup=fs::remove_dir_all(&dir).map_err(|e|e.to_string())
+TAC # result.and(cleanup)
+TTT # end

@@ -1,0 +1,23 @@
+[
+  {
+    "setup": "tools-only",
+    "task": "new-event",
+    "answer": "tools-only-new-event.txt",
+    "sha256": "ae2aa690df916f4b3eae0f7e9f9fcde2db06d23daf7968647dd66c6ede2560b0",
+    "matched_id": "in-s0a0eb325a960f957"
+  },
+  {
+    "setup": "skill",
+    "task": "new-event",
+    "answer": "skill-new-event.html",
+    "sha256": "ff3aaf681626298b5af24dc45702fd38c817134d9024045a2bee28b461286389",
+    "matched_id": "in-s1f9509896b5e80e9"
+  },
+  {
+    "setup": "skill",
+    "task": "changed-brief",
+    "answer": "skill-changed-brief.html",
+    "sha256": "4070f193578bb7c1037d5ce46d8612ebabab34dcb16e7748c89c10f917397b19",
+    "matched_id": null
+  }
+]

@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	base	claude-haiku-5-5	0	0	0	4522	wrong	Hi there,  The shortlist has been approved. Next steps:  - **Your action:** pick a cover. - **My action:** send the prints.  I'll let you know once the prints are on their way.  Thanks, Tess
+new-brief	base	claude-haiku-5-5	0	0	0	2834	pass	The cover is ready.
+scope	base	claude-haiku-5-5	0	0	0	3020	pass	Little team. Big plans. Save my place.
+rewrite	base	claude-haiku-5-5	0	0	0	2600	pass	Room for your whole team.
+loop	base	claude-haiku-5-5	0	0	1	6632	pass	relink
+confirmed	base	claude-haiku-5-5	0	0	0	3192	pass	done

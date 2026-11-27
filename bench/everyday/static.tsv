@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+encore	static	gpt-6.2-astra	1631	0	0	5777	pass	main
+lift	static	gpt-6.2-astra	1631	0	0	8196	pass	encore
+gift	static	gpt-6.2-astra	1631	0	1	11196	pass	moon
+public	static	gpt-6.2-astra	1631	0	0	7413	pass	sun
+photo	static	gpt-6.2-astra	1631	0	0	5250	pass	palm
+shelf	static	gpt-6.2-astra	1631	0	0	5718	pass	measure

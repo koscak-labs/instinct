@@ -1,0 +1,1 @@
+Suggestion impact check; Next-decision attribution; Recommendation A/B test; Exposure versus outcome logs; Did the tip help; Intent-to-treat comparison; Assigned arm analysis; Nudge effectiveness; Click-through versus conversion; Feature exposure before decision

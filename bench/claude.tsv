@@ -1,0 +1,7 @@
+route	model	case	arm	recall_ms	context_bytes	decision_ms	first_correct	exact_pass	answer
+claude	haiku	dispatch	base	0	0	4795	true	true	B 1
+claude	haiku	policy	static	0	665	2988	true	true	A 2
+claude	haiku	dispatch	live	2	1904	10911	true	true	B 1
+claude	haiku	policy	base	0	0	2966	true	true	A 2
+claude	haiku	dispatch	static	0	665	4703	true	true	B 1
+claude	haiku	policy	live	3	1904	9749	true	true	A 2

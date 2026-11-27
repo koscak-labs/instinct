@@ -1,0 +1,87 @@
+# Instinct personal-bank lookup benchmark [GAMMA-Codon/S] v0.1.0
+AAC # use std::{env, fs::{self, File}, io::{self, BufRead, BufReader, BufWriter, Write}, path::Path, process::{Command,Stdio}, time::{Instant, SystemTime, UNIX_EPOCH}}
+AAA # fn resident(engine:&Path, store:&Path, count:usize, format:&str) -> io::Result<()>
+AAC # let mut cmd = Command::new(engine)
+AGA # for (key,_) in env::vars_os().filter(|(k,_)| k.to_string_lossy().starts_with("INSTINCT_"))
+AAC # cmd.env_remove(key)
+TTT # end
+AAC # let mut child = cmd.arg("mcp").env("INSTINCT_STORE",store).stdin(Stdio::piped()).stdout(Stdio::piped()).spawn()?
+AAC # let mut input = child.stdin.take().unwrap()
+AAC # let mut output = BufReader::new(child.stdout.take().unwrap())
+AAC # let mut samples = Vec::new()
+AGA # for trial in 0..33
+AAC # let id = 1 + (trial * 271) % (count-1)
+AAC # let message = r#"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"instinct_recall","arguments":{"project":"studio","q":"groupKEY itemKEY","k":1}}}"#.replace("KEY",&id.to_string())
+AAC # let now = Instant::now()
+AAC # writeln!(input,"{message}")?
+AAC # input.flush()?
+AAC # let mut reply = String::new()
+AAC # output.read_line(&mut reply)?
+AAC # let elapsed = now.elapsed().as_secs_f64()*1000.0
+CAA # if !reply.contains(&format!("[fixture-{id}]")) || !reply.contains(r#""isError":false"#)
+AAC # return Err(io::Error::other("resident MCP returned the wrong fixture"))
+TTT # end
+CAA # if trial>=2
+AAC # samples.push(elapsed)
+TTT # end
+TTT # end
+AAC # drop(input)
+CAA # if !child.wait()?.success()
+AAC # return Err(io::Error::other("MCP failed"))
+TTT # end
+AAC # samples.sort_by(f64::total_cmp)
+AAC # println!("resident-mcp,{format},{count},{},{:.2},{:.2}",store.metadata()?.len(),samples[15],samples[29])
+TAC # Ok(())
+TTT # end
+AAA # fn measure(engine: &Path, store: &Path, count: usize) -> io::Result<()>
+AAC # let mut writer = BufWriter::new(File::create(store)?)
+AGA # for i in 0..count
+AAC # let cue = if i == 0 { "approved headline".to_owned() } else { format!("delivery packing group{i} item{i}") }
+AAC # writeln!(writer, r#"{{"kind":"discovery","id":"fixture-{i}","title":"Task {i}","when":"{cue}","found":"The requested edit worked","how":"Use the accepted revision","evidence":"Checked the output","source":"banked","state":"candidate","scope_project":"studio"}}"#)?
+TTT # end
+AAC # writer.flush()?
+AAC # drop(writer)
+AAC # let native = store.with_extension("hxdb")
+AAC # let migration = Command::new(engine).arg("migrate").arg("--store").arg(store).arg("--to").arg(&native).output()?
+CAA # if !migration.status.success()
+AAC # return Err(io::Error::other(String::from_utf8_lossy(&migration.stderr).to_string()))
+TTT # end
+AAC # let paths = [store, native.as_path()]
+AAC # let mut samples = [Vec::new(),Vec::new()]
+AGA # for trial in 0..33
+AGA # for step in 0..2
+AAC # let arm = (trial + step) % 2
+AAC # let mut cmd = Command::new(engine)
+AGA # for (key, _) in env::vars_os().filter(|(k, _)| k.to_string_lossy().starts_with("INSTINCT_"))
+AAC # cmd.env_remove(key)
+TTT # end
+AAC # cmd.env("INSTINCT_STORE", paths[arm]).args(["decide", "--project", "studio", "--q", "Keep the approved headline"])
+AAC # let start = Instant::now()
+AAC # let output = cmd.output()?
+AAC # let elapsed = start.elapsed().as_secs_f64() * 1000.0
+AAC # let reply = String::from_utf8_lossy(&output.stdout)
+CAA # if !output.status.success() || !reply.contains(r#""id":"fixture-0""#) || reply.matches(r#""id":"#).count() != 1
+AAC # return Err(io::Error::other("unexpected fixture result"))
+TTT # end
+CAA # if trial >= 2
+AAC # samples[arm].push(elapsed)
+TTT # end
+TTT # end
+TTT # end
+AGA # for (arm, times) in samples.iter_mut().enumerate()
+AAC # times.sort_by(f64::total_cmp)
+AAC # println!("cold-cli,{},{},{},{:.2},{:.2}", ["jsonl","helix-db"][arm],count,paths[arm].metadata()?.len(),times[15],times[29])
+AAC # resident(engine,paths[arm],count,["jsonl","helix-db"][arm])?
+TTT # end
+TAC # Ok(())
+TTT # end
+AAA # fn main() -> io::Result<()>
+AAC # let engine = env::args_os().nth(1).ok_or_else(|| io::Error::other("supply the path to the release instinct executable"))?
+AAC # let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos()
+AAC # let scratch = env::temp_dir().join(format!("instinct-storage-{}-{stamp}", std::process::id()))
+AAC # fs::create_dir(&scratch)?
+AAC # println!("mode,format,lessons,bytes,p50_ms,p95_ms")
+AAC # let result = [100, 1000, 10000].into_iter().try_for_each(|n| measure(Path::new(&engine), &scratch.join(format!("bank-{n}.jsonl")), n))
+AAC # fs::remove_dir_all(&scratch)?
+TAC # result
+TTT # end

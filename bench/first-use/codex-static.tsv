@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	static	gpt-6.2-astra	2296	0	0	6223	pass	You: pick a cover / Me: send the prints
+new-brief	static	gpt-6.2-astra	2296	0	0	6743	pass	The cover is ready.
+scope	static	gpt-6.2-astra	2296	0	0	7877	pass	Little team. Big plans. Save my place.
+rewrite	static	gpt-6.2-astra	2296	0	0	5558	pass	Room for your whole team.
+loop	static	gpt-6.2-astra	2296	0	1	14714	pass	relink
+confirmed	static	gpt-6.2-astra	2296	0	0	6966	pass	done

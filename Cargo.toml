@@ -1,0 +1,26 @@
+[package]
+name = "instinct"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+license = "Apache-2.0"
+authors = ["Filip Koščák"]
+description = "An inference-time adaptation skill for AI agents: learn methods from experience and use them to choose a first move across harnesses."
+
+keywords = ["agent-memory", "agent-skills", "mcp", "ai-agents", "decision-making"]
+
+[[example]]
+name = "transfer"
+path = "bench/transfer.rs"
+
+[[example]]
+name = "backtest"
+path = "bench/backtest/run.rs"
+
+[[example]]
+name = "storage"
+path = "bench/storage.rs"
+
+[[example]]
+name = "helix-db"
+path = "tools/db-workbench.rs"

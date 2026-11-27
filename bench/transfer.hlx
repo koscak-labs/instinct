@@ -1,0 +1,55 @@
+# A clean-process, single-decision transfer benchmark. Requires jq and the selected agent CLI.
+AAC # use std::process::Command
+AAC # use std::path::{Path,PathBuf}
+AAC # use std::time::Instant
+AAA # fn run(cmd:&mut Command)->String
+AAC # let out=cmd.output().expect("start command")
+AAC # assert!(out.status.success(),"command failed: {}",String::from_utf8_lossy(&out.stderr))
+TAC # String::from_utf8(out.stdout).expect("UTF-8 output").trim().to_owned()
+TTT # end
+AAA # fn field(path:&Path,filter:&str)->String
+TAC # run(Command::new("jq").args(["-er",filter]).arg(path))
+TTT # end
+AAA # fn ask(route:&str,model:&str,work:&Path,prompt:&str)->String
+AAC # let mut cmd=Command::new("timeout")
+AAC # cmd.arg("90").arg(route).current_dir(&work)
+AAC # if route=="claude" {cmd.args(["-p","--model",model,"--tools","","--settings","{\"disableAllHooks\":true}","--setting-sources","","--strict-mcp-config","--no-session-persistence"]);}else{cmd.args(["exec","--ephemeral","--ignore-user-config","--skip-git-repo-check","-s","read-only" ,"-m",model,"-c","features.shell_tool=false","-o","answer.txt"]);}
+AAC # let output=cmd.arg(prompt).output().expect("run harness")
+AAC # let answer=if !output.status.success(){{eprintln!("{}",String::from_utf8_lossy(&output.stderr)); format!("ERROR exit {}",output.status)}}else if route=="codex"{std::fs::read_to_string(work.join("answer.txt")).unwrap()}else{String::from_utf8_lossy(&output.stdout).to_string()}
+AAC # let answer=answer.trim().replace(['\n','\t']," ")
+TAC # answer
+TTT # end
+AAA # fn main
+AAC # let root=PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+AAC # let engine=std::env::current_exe().unwrap().parent().unwrap().parent().unwrap().join("instinct")
+AAC # let route=std::env::args().nth(1).unwrap_or_else(||"claude".into())
+AAC # assert!(matches!(route.as_str(),"claude"|"codex"))
+AAC # let model=std::env::args().nth(2).unwrap_or_else(||if route=="claude"{"haiku".into()}else{"gpt-6.2-sol".into()})
+AAC # let work=PathBuf::from(run(Command::new("mktemp").arg("-d")))
+AAC # let mode=std::env::args().nth(3).unwrap_or_else(||"framed".into())
+AAC # assert!(matches!(mode.as_str(),"raw"|"framed"|"prepared"))
+AAC # let cases=root.join(if mode=="prepared"{"bench/fresh-cases.json"}else{"bench/cases.json"})
+AAC # let discovery=root.join("bench/discovery.json")
+AAC # let bank=|args:&[String]|run(Command::new(&engine).env_clear().env("INSTINCT_STORE",work.join("bank.jsonl")).args(args))
+AAC # let mut args=vec!["bank".to_string()]
+AAC # for key in ["title","when","found","how","evidence"] {args.extend([format!("--{key}"),field(&discovery,&format!(".{key}"))]);}
+AAC # if mode=="prepared" {args.extend(["--tags".to_string(),std::fs::read_to_string(root.join("bench/transfer-cues.txt")).unwrap()]);}
+AAC # bank(&args)
+AAC # let static_method=field(&discovery,".how")
+AAC # println!("route\tmodel\tcase\tarm\trecall_ms\tcontext_bytes\tdecision_ms\tfirst_correct\texact_pass\tanswer")
+TAC # for (index,arm) in [(0,"base"),(1,"static"),(0,"live"),(1,"base"),(0,"static"),(1,"live")] {
+AAC # let question=field(&cases,&format!(".[{index}].question"))
+AAC # let expected=field(&cases,&format!(".[{index}].key"))
+AAC # let name=field(&cases,&format!(".[{index}].name"))
+AAC # let start=Instant::now()
+AAC # let cue=if arm=="live" && mode=="framed"{ask(&route,&model,&work,&format!("Describe the underlying decision situation in one sentence and six reusable search terms from other domains. Include any condition that changes the appropriate method. Do not solve the case. Case: {question}"))}else{String::new()}
+AAC # assert!(!cue.starts_with("ERROR"),"situation extraction failed")
+AAC # let lookup=Instant::now()
+AAC # let context=match arm {"live"=>bank(&["recall".into(),"--q".into(),format!("{cue} {question}"),"--k".into(),"1".into()]),"static"=>static_method.clone(),_=>String::new()}
+AAC # let retrieval=lookup.elapsed().as_millis()
+AAC # let prompt=format!("Use only the supplied case. Optional previous experience: {context}\nCase: {question}\nReturn only the extract letter and the integer, separated by one space.")
+AAC # let answer=ask(&route,&model,&work,&prompt)
+AAC # println!("{route}\t{model}\t{name}\t{arm}\t{retrieval}\t{}\t{}\t{}\t{}\t{}",context.len(),start.elapsed().as_millis(),answer.split_whitespace().next()==expected.split_whitespace().next(),answer==expected,answer)
+AAC # }
+AAC # std::fs::remove_dir_all(work).unwrap()
+TTT # end

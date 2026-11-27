@@ -1,0 +1,9 @@
+# First Helix DB program. The workbench runs it in a temporary directory.
+GGGGT # db
+AAA # fn main()
+AAC # let path = "lesson.hxdb"
+AAC # db_putv(path, "headline", "Keep the approved headline")
+AAC # let accepted = db_getv(path, "headline")
+AAC # assert_eq!(accepted, "Keep the approved headline")
+AAC # println!("{} | {}", accepted, db_verify(path))
+TTT # end

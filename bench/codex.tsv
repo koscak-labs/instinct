@@ -1,0 +1,7 @@
+route	model	case	arm	recall_ms	context_bytes	decision_ms	first_correct	exact_pass	answer
+codex	gpt-6.2-sol	dispatch	base	0	0	4596	true	true	B 1
+codex	gpt-6.2-sol	policy	static	0	665	5026	true	true	A 2
+codex	gpt-6.2-sol	dispatch	live	2	1904	13946	true	true	B 1
+codex	gpt-6.2-sol	policy	base	0	0	5180	true	true	A 2
+codex	gpt-6.2-sol	dispatch	static	0	665	5286	true	true	B 1
+codex	gpt-6.2-sol	policy	live	2	1904	13100	true	true	A 2

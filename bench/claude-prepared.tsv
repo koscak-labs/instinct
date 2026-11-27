@@ -1,0 +1,7 @@
+route	model	case	arm	recall_ms	context_bytes	decision_ms	first_correct	exact_pass	answer
+claude	haiku	dispensing	base	0	0	3205	true	true	C 1
+claude	haiku	coupon	static	0	665	2861	true	true	B 2
+claude	haiku	dispensing	live	2	0	3097	true	true	C 1
+claude	haiku	coupon	base	0	0	3079	true	true	B 2
+claude	haiku	dispensing	static	0	665	2683	true	true	C 1
+claude	haiku	coupon	live	1	0	2823	true	true	B 2

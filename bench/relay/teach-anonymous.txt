@@ -1,0 +1,13 @@
+At Lantern Studio, yesterday's first print run put names from the order account on badges. The desk had to reprint. You have the original export and the complete sheet the desk accepted. Work out the repeatable method. Use the Instinct banking tool to save that discovery for project lantern-studio. Capture how you know, when to use it and when to reconsider. Do not save individual names. A different assistant will do the next event.
+
+Each row is one update to a seat. The desk used yellow sleeves for badge pickup and green sleeves for badges already delivered. A guest who leaves their badge name blank at pickup gets a badge reading "Hello, friend". The order account may belong to someone else. Today's sleeve meanings can be changed by the current desk brief.
+
+seat,edit,sleeve,order account,badge name
+S1,1,yellow,ACCOUNT_1,GUEST_1
+S2,1,green,ACCOUNT_2,GUEST_2
+S3,1,yellow,ACCOUNT_3,
+S4,2,green,ACCOUNT_4,GUEST_3
+S4,1,yellow,ACCOUNT_4,GUEST_3
+S5,1,yellow,ACCOUNT_1,GUEST_1
+
+Accepted sheet (all badges): S1 = GUEST_1; S3 = Hello, friend; S5 = GUEST_1.

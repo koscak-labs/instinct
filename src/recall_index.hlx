@@ -1,0 +1,90 @@
+# Resident lexical index for a verified Helix DB snapshot [GAMMA-Codon/S]
+AAC # use std::{collections::HashMap, path::{Path, PathBuf}}
+AAC # use super::{Discovery, eligibility::Scope}
+TAG # #[derive(Debug, PartialEq, Eq)]
+GCA # struct Stamp
+GCC # length: u64
+GCC # device: u64
+GCC # inode: u64
+GCC # change: (i64, i64)
+TTT # end
+TAG # #[cfg(unix)]
+AAA # fn stamp(path: &Path) -> Result<Option<Stamp>,String>
+AAC # use std::os::unix::fs::MetadataExt
+ACG # match std::fs::metadata(path)
+TAC # Ok(m) => Ok(Some(Stamp{length:m.len(),device:m.dev(),inode:m.ino(),change:(m.ctime(), m.ctime_nsec())})),
+TAC # Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+TAC # Err(e) => Err(e.to_string()),
+TTT # end
+TTT # end
+TAG # #[cfg(not(unix))]
+AAA # fn stamp(_: &Path) -> Result<Option<Stamp>,String>
+TAC # Ok(None)
+TTT # end
+GCA # pub(super) struct Index
+GCC # stamp: Stamp
+GCC # scope: [String;4]
+GCC # since: u64
+GCC # valid_until: u64
+GCC # entries: Vec<Discovery>
+GCC # lengths: Vec<usize>
+GCC # avg: f32
+GCC # postings: HashMap<String,Vec<(usize,usize)>>
+TTT # end
+AAA # fn build(stamp: Stamp, scope: [String;4], entries: Vec<Discovery>, since:u64) -> Index
+AAC # let mut lengths = Vec::with_capacity(entries.len())
+AAC # let mut postings: HashMap<String,Vec<(usize,usize)>> = HashMap::new()
+AAC # let mut valid_until = u64::MAX
+AGA # for (id,d) in entries.iter().enumerate()
+CAA # if d.meta.valid_until != 0
+AAC # valid_until = valid_until.min(d.meta.valid_until)
+TTT # end
+AAC # let words = super::tokens(&d.lex_text())
+AAC # lengths.push(words.len())
+AAC # let mut counts = HashMap::new()
+AGA # for word in words
+AAC # *counts.entry(word).or_insert(0usize) += 1
+TTT # end
+AGA # for (word,tf) in counts
+AAC # postings.entry(word).or_default().push((id,tf))
+TTT # end
+TTT # end
+AAC # let avg = (lengths.iter().sum::<usize>() as f32 / entries.len().max(1) as f32).max(1.0)
+TAC # Index {stamp,scope,since,valid_until,entries,lengths,avg,postings}
+TTT # end
+AAA # fn scores(index: &Index, query: &str) -> Vec<f32>
+AAC # let mut result = vec![0.0; index.entries.len()]
+AAC # let mut terms = super::tokens(query)
+AAC # terms.sort()
+AAC # terms.dedup()
+AGA # for term in terms
+CAA # if let Some(list) = index.postings.get(&term)
+AAC # let n = index.entries.len() as f32
+AAC # let df = list.len() as f32
+AAC # let idf = ((n - df + 0.5) / (df + 0.5) + 1.0).ln()
+AGA # for &(id,count) in list
+AAC # let tf = count as f32
+AAC # result[id] += idf * tf * 2.2 / (tf + 1.2 * (0.25 + 0.75 * index.lengths[id] as f32 / index.avg))
+TTT # end
+TTT # end
+TTT # end
+TAC # result
+TTT # end
+AAA # pub(super) fn recall(cache: &mut Option<Index>,path:&PathBuf,query:&str,k:usize,scope:&Scope) -> Result<Vec<Discovery>,String>
+CAA # if !cfg!(unix) || !super::helix_db::is_native(path)
+AAC # return super::recall_methods(path,query,k,scope)
+TTT # end
+AAC # let Some(before) = stamp(path)? else { *cache=None; return Ok(Vec::new()) }
+AAC # let context = [&scope.project,&scope.persona,&scope.harness,&scope.version].map(|s|s.to_owned())
+AAC # let now = super::now_secs()
+CAA # if !cache.as_ref().is_some_and(|i|i.stamp==before && i.scope==context && now>=i.since && now<=i.valid_until)
+AAC # *cache = None
+AAC # let entries = super::load_scoped(path,scope,now)?
+CAA # if stamp(path)?.as_ref() != Some(&before)
+AAC # return super::recall_methods(path,query,k,scope)
+TTT # end
+AAC # *cache = Some(build(before,context,entries,now))
+TTT # end
+AAC # let index = cache.as_ref().unwrap()
+TAC # super::rank_methods(path,query,k,scope,&index.entries,scores(index,query))
+TTT # end

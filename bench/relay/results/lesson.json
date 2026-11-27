@@ -1,0 +1,10 @@
+{
+  "id": "in-s7a806d337a84c6a3",
+  "scope_project": "lantern-studio",
+  "title": "Badge print sheet: derive from latest seat edit, pickup sleeve, badge-name column only",
+  "when": "Building a badge print list from a seat-update export (one row per seat edit, with sleeve colour and badge name), for a badge pickup desk at a Lantern Studio event.",
+  "found": "Print only seats whose highest-numbered edit is a pickup sleeve. Take the badge text from the badge-name column of that same row. If blank, print \"Hello, friend\". Never use the order-account column for badge text, since the account holder may not be the guest. Sort edits by the numeric edit field, not by file order, because edits for a seat can appear out of order. Delivered (green) seats are excluded even if an earlier edit on that seat was yellow.",
+  "how": "Compared the original export against the desk-accepted sheet, then checked which rule reproduces the accepted sheet exactly. Tested three candidate rules: taking the account column, taking every yellow row, and taking the latest row per seat. Only the latest-row, pickup-sleeve, badge-name rule matches.",
+  "reconsider": "Change the rule if the desk brief changes which sleeve colour means pickup. Also reconsider if edit numbers are missing, duplicated, or not sequential per seat, or if the badge-name field is ever meant to be derived from the order account. Re-check against the accepted sheet before printing.",
+  "evidence": "Export had 6 rows over 5 seats. Latest-edit rule gives 3 print lines: 2 guest names and 1 \"Hello, friend\" for a blank name. That matches the accepted sheet exactly (3 of 3). A yellow-row filter would wrongly add one delivered seat whose earlier edit was yellow. The order-account rule would print account holders, which was the cause of the reprint. Not verified on a second event."
+}

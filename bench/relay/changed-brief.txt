@@ -1,0 +1,8 @@
+Please make the printable pickup badges for the next Lantern Studio workshop. The desk changed its convention for this event: green sleeves are waiting for pickup; yellow sleeves have already received badges. At this event an empty badge name should read "Welcome". Use the highest edit for each seat, and keep separate seats even if badge names repeat. The order account may belong to somebody else.
+seat,edit,sleeve,order account,badge name
+V01,1,green,Ali Wood,Lux
+V02,2,yellow,Leo Page,Fox
+V03,1,green,Nia Moss,
+V04,2,green,Max Reed,Lux
+V02,1,green,Leo Page,Fox
+V04,1,yellow,Max Reed,Lux

@@ -1,0 +1,28 @@
+{
+  "bank": [
+    {
+      "title": "Short one-line client update format",
+      "when": "When Tess asks for her usual client update and the message is a client-facing update about who does what.",
+      "found": "A full progress report was too long, and the client had to ask who should do what.",
+      "how": "Write the update as a single line that pairs each person with their task, using the form \"You: [task] / Me: [task]\".",
+      "evidence": "Tess tried \"You: choose a photo / Me: finish the poster.\" The client replied with their choice, and Tess approved that format for her usual client updates.",
+      "reconsider": "Apply this only to Tess's usual client updates. She also sends other message types, and this approval does not cover them. Check before using it for anything else."
+    },
+    {
+      "title": "Fix only the typo in approved copy",
+      "when": "When asked to clean up text the owner has already approved, and the request is only to correct errors.",
+      "found": "An assistant fixed a misspelling but also renamed the button and rewrote the headline, so the owner reverted the whole version.",
+      "how": "Correct only the misspelling and keep every other word exactly as it was.",
+      "evidence": "The accepted revision fixed the misspelling and preserved all other wording. Later, the same owner explicitly asked for a new headline and accepted replacement copy.",
+      "reconsider": "Only keep the wording unchanged when the request is a cleanup. If the owner explicitly asks for new copy, such as a new headline, write it. This came from one owner's preferences and may not hold for others."
+    },
+    {
+      "title": "Check the shared link as the reader",
+      "when": "When a pack shows Ready in the author's editor, and a reader needs to see the latest version through a shared link.",
+      "found": "The editor showed Ready, but an intended reader still saw the old edition after two identical exports.",
+      "how": "Open the exact shared link the way the reader would see it, and confirm it shows the new file. If it points to the old file, fix the link rather than exporting again.",
+      "evidence": "Opening the shared link as the reader showed it pointed to the old file. The owner corrected the link, and the reader then opened the new edition. No later export was needed.",
+      "reconsider": "This worked because the problem was the link, not the export. If the reader sees something different for another reason, such as caching or permissions, check that instead. Do not assume this applies to every delivery problem."
+    }
+  ]
+}

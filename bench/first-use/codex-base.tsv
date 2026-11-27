@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	base	gpt-6.2-astra	0	0	1	18337	wrong	You: pick a cover / Me: send the prints.
+new-brief	base	gpt-6.2-astra	0	0	0	6042	pass	The cover is ready.
+scope	base	gpt-6.2-astra	0	0	0	7765	pass	Little team. Big plans. Save my place.
+rewrite	base	gpt-6.2-astra	0	0	0	8209	pass	Room for your whole team.
+loop	base	gpt-6.2-astra	0	0	1	10701	pass	relink
+confirmed	base	gpt-6.2-astra	0	0	0	5470	pass	done

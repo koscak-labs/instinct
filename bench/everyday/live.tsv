@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+encore	live	gpt-6.2-astra	651	2	0	6271	pass	main
+lift	live	gpt-6.2-astra	651	2	0	7675	pass	encore
+gift	live	gpt-6.2-astra	630	1	1	14378	pass	moon
+public	live	gpt-6.2-astra	630	2	0	6107	pass	sun
+photo	live	gpt-6.2-astra	643	2	0	5976	pass	palm
+shelf	live	gpt-6.2-astra	30	2	0	6802	pass	measure

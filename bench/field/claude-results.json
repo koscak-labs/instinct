@@ -1,0 +1,62 @@
+[
+  {
+    "arm": "static",
+    "context_bytes": 182,
+    "lookup_ms": 0.0,
+    "total_ms": 6413,
+    "commands": 2,
+    "first_read": "scores.csv",
+    "reads": [
+      "scores.csv",
+      "receipts.csv"
+    ],
+    "failed_reads": 0,
+    "answer": "**retries 9 9**\n\nJoining the two files by job ID gives 3 rejected jobs (z3, q1, x7) and 3 accepted jobs (a2, b5, k9), so there are 9 rejection/acceptance pairs. Every rejected job has more retries than every accepted job (rejected 5, 3, 4 vs. accepted 2, 0, 1), so retries orders all 9 pairs correctly. Ink similarity gets 5 of 9 (x7 at 96 is the only rejected job above every accepted one, and z3 and q1 each beat only a2).\n\nI didn't edit any files.",
+    "expected": [
+      "retries",
+      9,
+      9
+    ],
+    "passed": false
+  },
+  {
+    "arm": "live",
+    "context_bytes": 723,
+    "lookup_ms": 2.2,
+    "total_ms": 5805,
+    "commands": 2,
+    "first_read": "scores.csv",
+    "reads": [
+      "scores.csv",
+      "receipts.csv"
+    ],
+    "failed_reads": 0,
+    "answer": "**retries**: 9/9\n\nThe receipts give three rejected jobs (z3, q1, x7) and three accepted jobs (a2, b5, k9). Retries orders all nine rejection/acceptance pairs correctly, with no ties. Ink similarity gets only 5 of 9 right, because the accepted job b5 (93) and k9 (89) have higher ink similarity than two of the rejected jobs.\n\nThe prior-experience note says a similarity measure can reward shared vocabulary even when the task failed. That matches this data: ink similarity is the weaker signal here. I didn't check the note's source, so I relied only on the files.",
+    "expected": [
+      "retries",
+      9,
+      9
+    ],
+    "passed": false
+  },
+  {
+    "arm": "base",
+    "context_bytes": 0,
+    "lookup_ms": 0.0,
+    "total_ms": 4988,
+    "commands": 2,
+    "first_read": "scores.csv",
+    "reads": [
+      "scores.csv",
+      "receipts.csv"
+    ],
+    "failed_reads": 0,
+    "answer": "**retries 9/9**\n\nRetries orders all 9 rejection/acceptance pairs correctly, so it is the score to prioritize with. Ink similarity gets 5 of 9. Rejected jobs are z3, q1 and x7; accepted jobs are a2, b5 and k9.",
+    "expected": [
+      "retries",
+      9,
+      9
+    ],
+    "passed": false
+  }
+]

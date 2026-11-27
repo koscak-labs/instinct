@@ -1,0 +1,12 @@
+[
+  {
+    "name": "dispensing",
+    "question": "A pharmacy asks how many dispensing choices could have been affected by a warning. Three orders triggered the alert. Order J showed the alert at 08:03 and was signed at 08:02; order K showed it at 08:05 and was signed at 08:07; order L never displayed it and was signed at 08:09. Pick the first extract: A = counts of alerts generated per ward; B = ward allocation list; C = display and signature times per order. Return the letter and the eligible count.",
+    "key": "C 1"
+  },
+  {
+    "name": "coupon",
+    "question": "A shop randomized a discount offer by household. Count all renewals among households assigned the coupon, whether opened or ignored. Records (assigned,opened,renewed): (yes,no,yes), (yes,yes,yes), (yes,no,no), (no,no,yes). Which extract first? A = opened coupons joined to renewal times; B = assignment joined to renewals for every household; C = printed coupons. Return its letter and the count.",
+    "key": "B 2"
+  }
+]

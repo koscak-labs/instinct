@@ -1,0 +1,70 @@
+# Instinct local event journal [GAMMA-Codon/S] v0.1.0
+AAC # use std::fs::{self, File, OpenOptions}
+AAC # use std::io::{BufRead, BufReader, ErrorKind, Read, Seek, SeekFrom, Write}
+AAC # use std::path::Path
+
+AAA # pub fn private_options() -> OpenOptions
+TAG # #[cfg(unix)]
+TAC # { use std::os::unix::fs::OpenOptionsExt; let mut opts = OpenOptions::new(); opts.mode(0o600); opts }
+TAG # #[cfg(not(unix))]
+TAC # { OpenOptions::new() }
+TTT # end
+
+AAA # pub fn read(path: &Path) -> Result<String, String>
+CAA # if super::helix_db::is_native(path)
+AAC # return super::helix_db::read(path)
+TTT # end
+ACG # let mut file = match File::open(path)
+TAC # Ok(file) => file,
+TAC # Err(e) if e.kind() == ErrorKind::NotFound => return Ok(String::new()),
+TAC # Err(e) => return Err(format!("cannot read {}: {e}", path.display())),
+TTT # end
+AAC # ;
+AAC # file.lock_shared().map_err(|e| format!("cannot lock {}: {e}", path.display()))?
+AAC # let mut text = String::new()
+AAC # file.read_to_string(&mut text).map_err(|e| format!("cannot read {}: {e}", path.display()))?
+TAC # Ok(text)
+TTT # end
+
+AAA # pub fn append(path: &Path, line: &str) -> Result<(), String>
+CAA # if super::helix_db::is_native(path)
+AAC # return super::helix_db::append(path, line)
+TTT # end
+CAA # if let Some(dir) = path.parent()
+AAC # fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {e}", dir.display()))?
+TTT # end
+AAC # let mut file = private_options().create(true).read(true).append(true).open(path).map_err(|e| format!("cannot open {}: {e}", path.display()))?
+AAC # let error = |e: std::io::Error| format!("cannot append to {}: {e}", path.display())
+AAC # file.lock().map_err(error)?
+AAC # let mut record = String::with_capacity(line.len() + 2)
+CAA # if file.metadata().map_err(error)?.len() > 0
+AAC # file.seek(SeekFrom::End(-1)).map_err(error)?
+AAC # let mut last = [0]
+AAC # file.read_exact(&mut last).map_err(error)?
+CAA # if last[0] != b'\n'
+# Imported files can omit LF. Preserve the final event; refuse a torn tail.
+AAC # file.rewind().map_err(error)?
+AAC # let tail = BufReader::new(&mut file).lines().last().transpose().map_err(error)?.unwrap_or_default()
+CAA # if !tail.trim().is_empty()
+AAC # super::parse_json(&tail).map_err(|e| format!("invalid final event in {}: {e}", path.display()))?
+TTT # end
+AAC # record.push('\n')
+TTT # end
+TTT # end
+AAC # record.push_str(line)
+AAC # record.push('\n')
+AAC # file.write_all(record.as_bytes()).map_err(error)?
+TAC # file.sync_data().map_err(error)
+TTT # end
+
+# Keep the stable identity lock across a multi-step check and append.
+AAA # pub fn identity_lock(path: &Path) -> Result<File, String>
+CAA # if let Some(parent) = path.parent()
+AAC # fs::create_dir_all(parent).map_err(|e| e.to_string())?
+TTT # end
+AAC # let mut lock_path = path.as_os_str().to_owned()
+AAC # lock_path.push(".lock")
+AAC # let lock = private_options().create(true).truncate(false).read(true).write(true).open(lock_path).map_err(|e| e.to_string())?
+AAC # lock.lock().map_err(|e| e.to_string())?
+TAC # Ok(lock)
+TTT # end

@@ -1,0 +1,48 @@
+name: Verify Instinct
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: sha256sum --check docs/helix-exports.sha256
+      - run: cargo test --locked --offline
+      - name: Run the public Helix DB contributor exercise
+        run: |
+          result=$(cargo run --quiet --locked --offline --example helix-db -- examples/first-db.hlx)
+          test "$result" = 'Keep the approved headline | ok=1 corrupt=0 corrupt_keys=[]'
+      - run: node --test tests/preview.test.mjs
+      - run: node --test tests/challenge-browser.mjs
+      - run: python3 bench/relay/verify.py
+      - name: Build standalone Linux executable
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo build --release --locked --offline --target x86_64-unknown-linux-gnu --bin instinct
+      - name: Exercise native Helix DB migration, recovery and resident recall
+        run: INSTINCT_TEST_BIN="$PWD/target/x86_64-unknown-linux-gnu/release/instinct" node --test tests/helix-db.test.mjs
+      - name: Exercise first-run experience and package the release
+        run: |
+          set -eu
+          mkdir -p dist/instinct/bench dist/skill-package
+          cp -r skills/instinct dist/skill-package/
+          cp LICENSE NOTICE dist/skill-package/instinct/
+          (cd dist/skill-package && zip -qr ../instinct-skill.zip instinct)
+          unzip -q dist/instinct-skill.zip -d "$RUNNER_TEMP/skill-install"
+          diff -r dist/skill-package/instinct "$RUNNER_TEMP/skill-install/instinct"
+          cp target/x86_64-unknown-linux-gnu/release/instinct dist/instinct/
+          cp docs/index.html dist/try-instinct.html
+          cp -r docs src runtime tools examples skills tests Cargo.toml Cargo.lock README.md RELEASE.md CONTRIBUTING.md LICENSE NOTICE dist/instinct/
+          cp -r bench/. dist/instinct/bench/
+          dist/instinct/instinct demo
+          (cd dist && tar czf instinct-linux-x86_64.tar.gz instinct)
+          (cd dist && sha256sum instinct-skill.zip instinct-linux-x86_64.tar.gz try-instinct.html > SHA256SUMS)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: instinct-linux-x86_64
+          path: |
+            dist/instinct-skill.zip
+            dist/instinct-linux-x86_64.tar.gz
+            dist/try-instinct.html
+            dist/SHA256SUMS

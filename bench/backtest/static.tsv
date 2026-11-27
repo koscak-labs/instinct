@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+grader	static	gpt-6.2-astra	1964	0	1	12479	pass	a,b
+stream	static	gpt-6.2-astra	1964	0	1	11872	pass	a,b
+replicas	static	gpt-6.2-astra	1964	0	0	4821	pass	5
+snapshot	static	gpt-6.2-astra	1964	0	0	5825	pass	2
+rejection	static	gpt-6.2-astra	1964	0	1	11362	pass	a
+neutral	static	gpt-6.2-astra	1964	0	0	4892	pass	5

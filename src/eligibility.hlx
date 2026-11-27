@@ -1,0 +1,78 @@
+# Instinct eligibility [EPSILON-Codon/PROTOTYPE] v0.1.0
+# Shared source for existing bank + spider; export-rust produces their included module.
+TAG # #[derive(Clone, Default, Debug)]
+GCA # pub struct Meta
+GCC # pub source: String
+GCC # pub state: String
+GCC # pub evidence_status: String
+GCC # pub project: String
+GCC # pub persona: String
+GCC # pub harness: String
+GCC # pub version: String
+GCC # pub valid_until: u64
+TTT # end
+TAG # #[derive(Clone, Default, Debug)]
+GCA # pub struct Scope
+GCC # pub project: String
+GCC # pub persona: String
+GCC # pub harness: String
+GCC # pub version: String
+TTT # end
+AAA # pub fn env_scope() -> Scope
+AAC # let v = |k: &str| std::env::var(k).unwrap_or_default()
+TAC # Scope { project: v("INSTINCT_PROJECT"), persona: v("INSTINCT_PERSONA"), harness: v("INSTINCT_HARNESS"), version: v("INSTINCT_HARNESS_VERSION") }
+TTT # end
+AAA # pub fn scope_check(m: &Meta, s: &Scope, now: u64) -> Result<(), &'static str>
+CAA # if m.state == "quarantined" || m.evidence_status == "contradicted"
+AAC # return Err("quarantined")
+TTT # end
+CAA # if m.valid_until != 0 && now > m.valid_until
+AAC # return Err("expired")
+TTT # end
+AGA # for (required, actual, reason) in [(&m.project, &s.project, "project"), (&m.persona, &s.persona, "persona"), (&m.harness, &s.harness, "harness"), (&m.version, &s.version, "version")]
+CAA # if !required.is_empty() && required != actual
+AAC # return Err(reason)
+TTT # end
+TTT # end
+TAC # Ok(())
+TTT # end
+AAA # pub fn eligible(m: &Meta, s: &Scope, now: u64, sim: Option<f32>, hits: u32, quiet: bool) -> Result<(), &'static str>
+AAC # scope_check(m, s, now)?
+CAA # if quiet
+AAC # return Err("quiet")
+TTT # end
+CAA # if (m.source == "mined" || m.source == "distilled" || m.state == "candidate") && hits == 0 && sim.map_or(true, |x| !x.is_finite() || x < 0.74)
+AAC # return Err("candidate_match_unproven")
+TTT # end
+TAC # Ok(())
+TTT # end
+AAA # pub fn quiet(useful: u32, irrelevant: u32) -> bool
+TAC # (irrelevant >= 2 && useful == 0) || (irrelevant >= 3 && (irrelevant as u64) * 4 >= (useful as u64 + irrelevant as u64) * 3)
+TTT # end
+AAA # pub fn unverified(m: &Meta) -> bool
+TAC # m.evidence_status != "verified"
+TTT # end
+AAA # pub fn preservation_check(source: &str, candidate: &str) -> Result<(), &'static str>
+# Conservative merge gate: require every numeric token and material uncertainty marker. No claim of semantic proof.
+AAC # let numbers = |s: &str| -> std::collections::BTreeSet<String> { s.split(|c: char| !c.is_ascii_digit() && c != '.' && c != '%' && c != '/').filter(|x| x.chars().any(|c| c.is_ascii_digit())).map(|x| x.trim_matches('.').to_string()).collect() }
+CAA # if !numbers(source).is_subset(&numbers(candidate))
+AAC # return Err("numeric_evidence_changed")
+TTT # end
+AAC # let a=source.to_lowercase()
+AAC # let b=candidate.to_lowercase()
+AGA # for q in ["not established", "not significant", "inconclusive", "uncertain", "unverified", "not proven", "shown subset", "early stop"]
+CAA # if a.contains(q) && !b.contains(q)
+AAC # return Err("qualifier_removed")
+TTT # end
+TTT # end
+CAA # if candidate.contains("[REDACTED]") && !source.contains("[REDACTED]")
+AAC # return Err("evidence_redacted")
+TTT # end
+TAC # Ok(())
+TTT # end
+AAA # pub fn strength(hits: u32, misses: u32) -> f32
+TAC # (hits as f32 + 1.0) / (u64::from(hits) + u64::from(misses) + 2) as f32
+TTT # end
+AAA # pub fn promoted(hits: u32, misses: u32, min_hits: u32) -> bool
+TAC # hits >= min_hits && strength(hits, misses) >= 0.6
+TTT # end

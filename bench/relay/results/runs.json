@@ -1,0 +1,76 @@
+{
+  "discovery_model": "claude-haiku-5-5",
+  "teacher_tools": [
+    "mcp__instinct__instinct_bank"
+  ],
+  "banked_id": "in-s7a806d337a84c6a3",
+  "consumer_model": "gpt-6.2-astra",
+  "runs": [
+    {
+      "task": "new-event",
+      "arm": "empty",
+      "output": "empty-new-event.txt",
+      "sha256": "ae2aa690df916f4b3eae0f7e9f9fcde2db06d23daf7968647dd66c6ede2560b0",
+      "calls": [
+        {
+          "tool": "instinct_recall",
+          "query": "usual pickup badge desk convention edit sleeve badge name seat ordering",
+          "matched_id": null
+        }
+      ]
+    },
+    {
+      "task": "new-event",
+      "arm": "live",
+      "output": "live-new-event.html",
+      "sha256": "31da070fef7138e36996be3cb3a1d83ad2f850e61aab6eb3fb0fc42cf9d8ba5c",
+      "calls": [
+        {
+          "tool": "instinct_recall",
+          "query": "usual desk convention pickup badges latest edit sleeve empty badge name sorting",
+          "matched_id": "in-s7a806d337a84c6a3"
+        }
+      ]
+    },
+    {
+      "task": "new-event",
+      "arm": "static",
+      "output": "static-new-event.html",
+      "sha256": "a9a94c60e324e2ed19bd9c632bd48c6fd2cb1ea2f064f746f740879091462ea8",
+      "calls": []
+    },
+    {
+      "task": "changed-brief",
+      "arm": "empty",
+      "output": "empty-changed-brief.html",
+      "sha256": "f67fb3153d18f2e6ce033ea9fb7cc18422af2f771085f77b50d42d3d8ea5634e",
+      "calls": []
+    },
+    {
+      "task": "changed-brief",
+      "arm": "live",
+      "output": "live-changed-brief.html",
+      "sha256": "9698fbcf872940381261031a1ee7131a5864e5daad6428dac4dc51b8c242620d",
+      "calls": []
+    },
+    {
+      "task": "changed-brief",
+      "arm": "static",
+      "output": "static-changed-brief.html",
+      "sha256": "e514287ae6bf4f1cb0cc5e6d9238d689b53b24f001f6260547e37a2872119b46",
+      "calls": []
+    }
+  ],
+  "verified_feedback": {
+    "id": "in-s7a806d337a84c6a3",
+    "task": "new-event",
+    "tool": "instinct_feedback",
+    "hits_before": 0,
+    "hits_after": 1,
+    "other_project_matches": 0
+  },
+  "download_sha256": {
+    "new-event": "f4fd631ceb7dce1033249c28c7622a3968584e8a3d66a8377a8d7626ece82537",
+    "changed-brief": "dba24e8a9ddeb5977af36b54ea6d5b1ed2e140204960e66cd095a11af9abdd17"
+  }
+}

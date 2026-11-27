@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lantern Studio workshop pickup badges</title>
+  <style>
+    @page { size: A4 portrait; margin: 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #24211d;
+      background: white;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(2, 90mm);
+      width: 180mm;
+      margin: 0 auto;
+    }
+    article {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 55mm;
+      padding: 8mm 4mm;
+      border: 0.2mm dashed #80796e;
+      break-inside: avoid;
+      text-align: center;
+    }
+    .name {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 29pt;
+      font-weight: bold;
+      line-height: 1.1;
+    }
+    .seat {
+      position: absolute;
+      bottom: 4mm;
+      right: 5mm;
+      font-size: 12pt;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+    @media screen {
+      body { padding: 10mm 0; }
+    }
+  </style>
+</head>
+<body>
+  <main aria-label="Workshop pickup badges">
+    <article data-seat="T02"><span class="name">Jules</span><span class="seat">T02</span></article>
+    <article data-seat="T03"><span class="name">Ash</span><span class="seat">T03</span></article>
+    <article data-seat="T04"><span class="name">Hello, friend</span><span class="seat">T04</span></article>
+    <article data-seat="T05"><span class="name">Jules</span><span class="seat">T05</span></article>
+  </main>
+</body>
+</html>

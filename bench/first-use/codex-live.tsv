@@ -1,0 +1,7 @@
+case	arm	model	context_bytes	recall_ms	docs	total_ms	grade	answer
+repeat	live	gpt-6.2-astra	794	2	0	8819	pass	You: pick a cover / Me: send the prints
+new-brief	live	gpt-6.2-astra	794	2	0	8356	pass	The cover is ready.
+scope	live	gpt-6.2-astra	843	2	0	6650	pass	Little team. Big plans. Save my place.
+rewrite	live	gpt-6.2-astra	30	2	0	8935	pass	Room for your whole team.
+loop	live	gpt-6.2-astra	952	1	1	14555	pass	relink
+confirmed	live	gpt-6.2-astra	952	2	0	5688	pass	done
