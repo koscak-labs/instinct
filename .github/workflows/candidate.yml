@@ -27,7 +27,8 @@ jobs:
           set -eu
           mkdir -p dist/instinct/bench dist/skill-package
           cp -r skills/instinct dist/skill-package/
-          cp LICENSE NOTICE dist/skill-package/instinct/
+          cmp LICENSE dist/skill-package/instinct/LICENSE
+          cmp NOTICE dist/skill-package/instinct/NOTICE
           (cd dist/skill-package && zip -qr ../instinct-skill.zip instinct)
           unzip -q dist/instinct-skill.zip -d "$RUNNER_TEMP/skill-install"
           diff -r dist/skill-package/instinct "$RUNNER_TEMP/skill-install/instinct"

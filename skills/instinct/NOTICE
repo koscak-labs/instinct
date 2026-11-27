@@ -1,0 +1,8 @@
+Instinct and the embedded Helix DB runtime
+Copyright 2026 Filip Koščák, Koščák Labs
+
+The Helix DB runtime in runtime/helix-db.rs is released under the Apache License,
+Version 2.0, by its copyright holder. It is derived from the native GGGGT
+database primitive of the Koščák Helix language. This distribution also includes
+the Instinct integration, public DB workbench and Rust exports of its Helix programs.
+The full hxc compiler is maintained separately.

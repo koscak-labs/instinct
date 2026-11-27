@@ -12,7 +12,17 @@
 
 **Try your own correction.** In the offline demo choose **Test a lesson on my own task**. Decide what success looks like, run the same request in two fresh chats, then compare the answers with their labels hidden. You can share just your verdict. Your criterion and pasted answers stay in the tab.
 
-**Install the skill.** Download **instinct-skill.zip** from the release and extract the `instinct/` folder into your project’s `.agents/skills/` (Codex) or `.claude/skills/` (Claude Code). Start a fresh session. The skill works within a conversation immediately. Connect a bank when you want trusted agents to reuse lessons across chats. [Storage, setup and Helix](skills/instinct/references/architecture.md)
+## Install in a project
+
+With Node.js 22.20 or later, run this in your project and choose your agent:
+
+```sh
+npx skills add koscak-labs/instinct --skill instinct
+```
+
+Start a fresh session. Instinct can learn from an outcome in that conversation straight away. To share experience across sessions, connect a bank to your agents. [Set up a shared bank](skills/instinct/references/architecture.md)
+
+For a manual install, extract the `instinct/` folder from the [skill ZIP](https://github.com/koscak-labs/instinct/releases/latest/download/instinct-skill.zip) into your project’s `.agents/skills/` for Codex or `.claude/skills/` for Claude Code.
 
 ## Try it in the AI you already use
 
